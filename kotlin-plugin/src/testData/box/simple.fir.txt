@@ -1,0 +1,31 @@
+FILE: simple.kt
+    package foo.bar
+
+    public final class A : R|kotlin/Any| {
+        public constructor(): R|foo/bar/A| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    public final class B : R|kotlin/Any| {
+        public constructor(message: R|kotlin/String|): R|foo/bar/B| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val message: R|kotlin/String| = R|<local>/message|
+            public get(): R|kotlin/String|
+
+    }
+    context(R|foo/bar/A|, R|foo/bar/B|)
+    public final fun myFun(): R|kotlin/String| {
+        ^myFun this@R|foo/bar/myFun|.R|foo/bar/B.message|
+    }
+    @R|io/github/kyay10/koncept/Concept|() public final fun gimmeB(): R|foo/bar/B| {
+        ^gimmeB R|foo/bar/B.B|(String(OK))
+    }
+    public final fun box(): R|kotlin/String| {
+        R|kotlin/with|<R|foo/bar/A|, R|kotlin/Nothing|>(R|foo/bar/A.A|(), <L> = with@fun R|foo/bar/A|.<anonymous>(): R|kotlin/Nothing| <inline=Inline, kind=EXACTLY_ONCE>  {
+            ^box R|foo/bar/myFun|()
+        }
+        )
+    }

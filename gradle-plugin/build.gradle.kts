@@ -34,7 +34,6 @@ buildConfig {
   buildConfigField("String", "PRELUDE_LIBRARY_GROUP", "\"${preludeProject.group}\"")
   buildConfigField("String", "PRELUDE_LIBRARY_NAME", "\"${preludeProject.name}\"")
   buildConfigField("String", "PRELUDE_LIBRARY_VERSION", "\"${preludeProject.version}\"")
-
 }
 
 java {
@@ -47,22 +46,22 @@ tasks.withType<KotlinCompile> {
   kotlinOptions.freeCompilerArgs += "-Xinline-classes"
 }
 val pluginDescription =
-  "Kotlin compiler plugin that optimises lambdas returned by inline functions and stored in local variables"
-val pluginName = "kotlin-lambda-return-inliner"
-val pluginDisplayName = "Kotlin Lambda Return Inliner compiler plugin"
+  "Kotlin FIR plugin to support C++ like concepts, DI, Higher-kinded types, and so much more!"
+val pluginName = "Koncept"
+val pluginDisplayName = "Koncept FIR compiler plugin"
 
 gradlePlugin {
   plugins {
     create(pluginName) {
-      id = "io.github.kyay10.kotlin-lambda-return-inliner"
+      id = "io.github.kyay10.koncept"
       displayName = pluginDisplayName
       description = pluginDescription
-      implementationClass = "io.github.kyay10.kotlinlambdareturninliner.LambdaReturnInlinerGradlePlugin"
+      implementationClass = "io.github.kyay10.koncept.KonceptGradlePlugin"
     }
   }
 }
 pluginBundle {
-  website = "https://github.com/kyay10/kotlin-lambda-return-inliner"
+  website = "https://github.com/kyay10/koncept"
   vcsUrl = website
   description = pluginDescription
 
@@ -73,16 +72,16 @@ pluginBundle {
       // SEO go brrrrrrr...
       tags = listOf(
         "kotlin",
-        "lambda",
-        "inline",
-        "optimization",
-        "struct",
-        "performance",
+        "concept",
+        "dependency-injection",
+        "higher kinded types",
+        "typeclass",
+        "tooling",
         "functional",
         "higher order function",
         "fp",
         "functional programming",
-        "graphics"
+        "category theory"
       )
       version = rootProject.version.cast()
     }

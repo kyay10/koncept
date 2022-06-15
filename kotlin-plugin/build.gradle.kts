@@ -9,15 +9,25 @@ plugins {
   id("com.github.gmazzo.buildconfig")
   id("convention.publication")
 
-  // https://en.wikipedia.org/wiki/Bootstrapping_(compilers) :)
-  id("io.github.kyay10.kotlin-lambda-return-inliner")
   kotlin("kapt")
 }
 
+sourceSets {
+  main {
+    resources.setSrcDirs(listOf("resources"))
+  }
+  test {
+    java.setSrcDirs(listOf("src/test", "src/test-gen"))
+    resources.setSrcDirs(listOf("src/testData"))
+  }
+}
+
+
 dependencies {
-  implementation("org.ow2.asm:asm:9.2")
-  compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable")
-  compileOnly("org.jetbrains.kotlin:kotlin-annotation-processing-embeddable")
+  testImplementation("org.jetbrains.kotlin:kotlin-compiler:${Dependencies.kotlinCompiler}")
+  implementation("org.ow2.asm:asm:9.3")
+  compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:${Dependencies.kotlinCompiler}")
+  compileOnly("org.jetbrains.kotlin:kotlin-annotation-processing-embeddable:${Dependencies.kotlinCompiler}")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   kapt("com.google.auto.service:auto-service:1.0.1")
   compileOnly("com.google.auto.service:auto-service-annotations:1.0.1")
@@ -26,23 +36,44 @@ dependencies {
   testImplementation(project(":prelude"))
 
   testImplementation(kotlin("test-junit5"))
-  testImplementation(platform("org.junit:junit-bom:5.7.1"))
-  testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-  testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable")
-  testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.7")
+  testImplementation(platform("org.junit:junit-bom:5.8.2"))
+  testImplementation("org.junit.jupiter:junit-jupiter")
+  testImplementation("org.junit.jupiter:junit-jupiter")
+  testImplementation("org.junit.platform:junit-platform-commons")
+  testImplementation("org.junit.platform:junit-platform-launcher")
+  testImplementation("org.junit.platform:junit-platform-runner")
+  testImplementation("org.junit.platform:junit-platform-suite-api")
+  testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:${Dependencies.kotlinCompiler}")
+  testImplementation("org.jetbrains.kotlin:kotlin-reflect:${Dependencies.kotlinCompiler}")
+  testImplementation("org.jetbrains.kotlin:kotlin-compiler-internal-test-framework:${Dependencies.kotlinCompiler}")
+  testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.9-alpha01")
+  testRuntimeOnly("org.jetbrains.kotlin:kotlin-test")
+  testRuntimeOnly("org.jetbrains.kotlin:kotlin-script-runtime")
+  testRuntimeOnly("org.jetbrains.kotlin:kotlin-annotations-jvm")
 }
+tasks.test {
+  dependsOn(project(":prelude").tasks.getByName("jvmJar"))
+  useJUnitPlatform()
+  doFirst {
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib", "kotlin-stdlib")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib-jdk8", "kotlin-stdlib-jdk8")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-reflect", "kotlin-reflect")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-test", "kotlin-test")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-script-runtime", "kotlin-script-runtime")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-annotations-jvm", "kotlin-annotations-jvm")
+  }
 
+  testLogging {
+    events("passed", "skipped", "failed")
+  }
+}
 buildConfig {
-  packageName(group.toString().replace("-", ""))
+  val packageSanitized = group.toString().replace("-", "")
+  packageName(packageSanitized)
   buildConfigField(
     "String",
-    "INLINE_INVOKE_FQNAME",
-    "\"${group.toString().replace("-", "")}.inlineInvoke\""
-  )
-  buildConfigField(
-    "String",
-    "CONTAINS_COPIED_DECLARATIONS_ANNOTATION_FQNAME",
-    "\"${group.toString().replace("-", "")}.ContainsCopiedDeclarations\""
+    "CONCEPT_FQNAME",
+    "\"$packageSanitized.Concept\""
   )
   buildConfigField(
     "String",
@@ -51,21 +82,29 @@ buildConfig {
   )
   buildConfigField(
     "String",
-    "SAMPLE_JVM_MAIN_PATH",
-    "\"${rootProject.projectDir.absolutePath}/sample/src/jvmMain/kotlin/\""
-  )
-  buildConfigField(
-    "String",
-    "SAMPLE_GENERATED_SOURCES_DIR",
-    "\"${rootProject.projectDir.absolutePath}/sample/build/generated/source/kotlinLambdaReturnInliner/jvmMain\""
+    "PRELUDE_JVM_JAR_PATH",
+    "\"${rootProject.projectDir.absolutePath}/prelude/build/libs/\""
   )
 }
 tasks.withType<KotlinCompile> {
   incremental = false
   kotlinOptions.jvmTarget = "1.8"
   kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+  kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
-
+val generateTests by tasks.creating(JavaExec::class) {
+  classpath = sourceSets.test.get().runtimeClasspath
+  mainClass.set("io.github.kyay10.koncept.GenerateTestsKt")
+}
+val compileTestKotlin by tasks.getting {
+  doLast {
+    generateTests.exec()
+  }
+}
+kapt {
+  generateStubs = false
+  this.includeCompileClasspath = true
+}
 java {
   withSourcesJar()
   withJavadocJar()
@@ -78,9 +117,12 @@ publishing {
     }
   }
 }
-tasks.withType<Test> {
-  useJUnitPlatform()
-  testLogging {
-    events("passed", "skipped", "failed")
-  }
+fun Test.setLibraryProperty(propName: String, jarName: String) {
+  val path = project.configurations
+    .testRuntimeClasspath.get()
+    .files
+    .find { """$jarName-\d.*jar""".toRegex().matches(it.name) }
+    ?.absolutePath
+    ?: return
+  systemProperty(propName, path)
 }

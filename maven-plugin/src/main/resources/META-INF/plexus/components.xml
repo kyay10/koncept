@@ -2,9 +2,9 @@
     <components>
         <component>
             <role>org.jetbrains.kotlin.maven.KotlinMavenPluginExtension</role>
-            <role-hint>kotlin-lambda-return-inliner</role-hint>
+            <role-hint>koncept</role-hint>
             <implementation>
-                io.github.kyay10.kotlinlambdareturninliner.LambdaReturnInlinerMavenPlugin
+                io.github.kyay10.koncept.KonceptMavenPlugin
             </implementation>
             <configuration/>
         </component>

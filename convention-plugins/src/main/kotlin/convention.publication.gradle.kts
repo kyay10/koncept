@@ -52,9 +52,9 @@ publishing {
 
     // Provide artifacts information requited by Maven Central
     pom {
-      name.set("Kotlin Lambda Return Inliner")
-      description.set("Kotlin compiler plugin that optimises lambdas returned by inline functions and stored in local variables")
-      url.set("https://github.com/kyay10/kotlin-lambda-return-inliner")
+      name.set("Koncept")
+      description.set("Kotlin FIR plugin to support C++ like concepts, DI, Higher-kinded types, and so much more!")
+      url.set("https://github.com/kyay10/koncept")
 
       licenses {
         license {
@@ -70,7 +70,7 @@ publishing {
         }
       }
       scm {
-        url.set("https://github.com/kyay10/kotlin-lambda-return-inliner.git")
+        url.set("https://github.com/kyay10/koncept.git")
       }
 
     }

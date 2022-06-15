@@ -6,14 +6,13 @@ plugins {
   kotlin("jvm")
   kotlin("kapt")
   id("org.jetbrains.dokka")
-  id("io.github.kyay10.kotlin-lambda-return-inliner")
   id("convention.publication")
 }
 
 dependencies {
   implementation("org.ow2.asm:asm:9.2")
-  compileOnly("org.jetbrains.kotlin:kotlin-compiler")
-  compileOnly("org.jetbrains.kotlin:kotlin-annotation-processing-embeddable")
+  compileOnly("org.jetbrains.kotlin:kotlin-compiler:${Dependencies.kotlinCompiler}")
+  compileOnly("org.jetbrains.kotlin:kotlin-annotation-processing-embeddable:${Dependencies.kotlinCompiler}")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
 
   kapt("com.google.auto.service:auto-service:1.0.1")
@@ -28,7 +27,6 @@ tasks.withType<KotlinCompile> {
 }
 
 val syncSource = tasks.register<Sync>("syncSource") {
-  from(project(":kotlin-plugin").sourceSets.main.get().allSource)
   into("src/main/kotlin")
   filter {
     // Replace shadowed imports from plugin module
@@ -41,6 +39,7 @@ tasks.withType<KotlinCompile> {
   dependsOn("syncSource")
   kotlinOptions.jvmTarget = "1.8"
   kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+  kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
 
 java {

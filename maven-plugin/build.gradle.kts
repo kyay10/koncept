@@ -10,16 +10,12 @@ plugins {
   id("convention.publication")
 }
 
-repositories {
-  mavenCentral()
-}
-
 dependencies {
-  implementation(kotlin("maven-plugin"))
+  implementation(kotlin("maven-plugin:${Dependencies.kotlinCompiler}"))
   api(project(":kotlin-plugin-native"))
 }
 
-// A bit of a hack to copy over the META-INF services information so that Maven knows about the LambdaReturnInlinerComponentRegistrar
+// A bit of a hack to copy over the META-INF services information so that Maven knows about the KonceptComponentRegistrar
 val servicesDirectory = "META-INF/services"
 val copyServices = tasks.register<Copy>("copyServices") {
   val nativePlugin = project(":kotlin-plugin-native")
