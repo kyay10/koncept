@@ -46,7 +46,7 @@ dependencies {
   testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:${Dependencies.kotlinCompiler}")
   testImplementation("org.jetbrains.kotlin:kotlin-reflect:${Dependencies.kotlinCompiler}")
   testImplementation("org.jetbrains.kotlin:kotlin-compiler-internal-test-framework:${Dependencies.kotlinCompiler}")
-  testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.9-alpha01")
+  testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.9")
   testRuntimeOnly("org.jetbrains.kotlin:kotlin-test")
   testRuntimeOnly("org.jetbrains.kotlin:kotlin-script-runtime")
   testRuntimeOnly("org.jetbrains.kotlin:kotlin-annotations-jvm")

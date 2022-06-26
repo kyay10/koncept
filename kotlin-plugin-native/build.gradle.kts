@@ -10,7 +10,7 @@ plugins {
 }
 
 dependencies {
-  implementation("org.ow2.asm:asm:9.2")
+  implementation("org.ow2.asm:asm:9.3")
   compileOnly("org.jetbrains.kotlin:kotlin-compiler:${Dependencies.kotlinCompiler}")
   compileOnly("org.jetbrains.kotlin:kotlin-annotation-processing-embeddable:${Dependencies.kotlinCompiler}")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -26,7 +26,8 @@ tasks.withType<KotlinCompile> {
   incremental = false
 }
 
-val syncSource = tasks.register<Sync>("syncSource") {
+val syncSource by tasks.registering(Sync::class) {
+  from(project(":kotlin-plugin").sourceSets.main.get().allSource)
   into("src/main/kotlin")
   filter {
     // Replace shadowed imports from plugin module
@@ -36,7 +37,7 @@ val syncSource = tasks.register<Sync>("syncSource") {
 }
 
 tasks.withType<KotlinCompile> {
-  dependsOn("syncSource")
+  dependsOn(syncSource)
   kotlinOptions.jvmTarget = "1.8"
   kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
@@ -51,6 +52,7 @@ publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["java"])
+      version = rootProject.version.toString()
     }
   }
 }

@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.resolve.bindingContextUtil.*
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.calls.smartcasts.getKotlinTypeForComparison
 import org.jetbrains.kotlin.resolve.calls.util.*
-import org.jetbrains.kotlin.resolve.checkers.ExperimentalUsageChecker
 import org.jetbrains.kotlin.resolve.constants.CompileTimeConstant
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.inline.InlineUtil
@@ -349,17 +348,6 @@ context(BindingContext) val KtExpression.variableResolvedCallWithAssert: Resolve
 
 context(BindingContext) fun Call.hasUnresolvedArguments(statementFilter: StatementFilter): Boolean =
   hasUnresolvedArguments(given<BindingContext>(), statementFilter)
-
-context(BindingContext) fun PsiElement.isExperimentalityAccepted(
-  annotationFqName: FqName,
-  languageVersionSettings: LanguageVersionSettings
-): Boolean = ExperimentalUsageChecker.run {
-  isExperimentalityAccepted(
-    annotationFqName,
-    languageVersionSettings,
-    given<BindingContext>()
-  )
-}
 
 context(BindingContext) val KtExpression.constant: CompileTimeConstant<*>?
   get() = org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator.run {

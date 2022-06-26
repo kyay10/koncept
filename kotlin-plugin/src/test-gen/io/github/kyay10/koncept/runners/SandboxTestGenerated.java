@@ -23,6 +23,12 @@ public class SandboxTestGenerated extends AbstractSandboxTest {
     }
 
     @Test
+    @TestMetadata("display concept.kt")
+    public void testDisplay_concept() throws Exception {
+        runTest("src/testData/sandbox/display concept.kt");
+    }
+
+    @Test
     @TestMetadata("general sandbox.kt")
     public void testGeneral_sandbox() throws Exception {
         runTest("src/testData/sandbox/general sandbox.kt");

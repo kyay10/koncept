@@ -3,10 +3,10 @@ package box
 import io.github.kyay10.koncept.Concept
 
 @Concept
-fun provideOk() = "OK2" // Change to OK for test to pass
+fun provideOk() = "OK"
 
 context(A) fun <A> given() = this@A
 
 fun box(): String {
-  return given()
+  return given<CharSequence>().toString()
 }
