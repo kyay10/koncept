@@ -21,6 +21,7 @@ package io.github.kyay10.koncept
 
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.UnknownConfigurationException
 import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
@@ -56,8 +57,11 @@ class KonceptGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
     val sourceSetName = kotlinCompilation.compilationName
 
-    kotlinCompilation.dependencies {
-      implementation("${BuildConfig.PRELUDE_LIBRARY_GROUP}:${BuildConfig.PRELUDE_LIBRARY_NAME}:${BuildConfig.PRELUDE_LIBRARY_VERSION}")
+    try {
+      kotlinCompilation.dependencies {
+        implementation("${BuildConfig.PRELUDE_LIBRARY_GROUP}:${BuildConfig.PRELUDE_LIBRARY_NAME}:${BuildConfig.PRELUDE_LIBRARY_VERSION}")
+      }
+    } catch (_: UnknownConfigurationException) {
     }
 
     return project.provider {

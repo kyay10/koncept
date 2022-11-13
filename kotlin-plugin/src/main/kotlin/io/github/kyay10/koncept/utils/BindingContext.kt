@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.codegen.JvmCodegenUtil
 import org.jetbrains.kotlin.codegen.getCallLabelForLambdaArgument
 import org.jetbrains.kotlin.codegen.isValueArgumentForCallToMethodWithTypeCheckBarrier
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.js.translate.utils.BindingUtils
@@ -289,7 +290,8 @@ context(BindingContext) val KtElement.enclosingDescriptor: DeclarationDescriptor
 context(BindingContext) val KtElement.enclosingFunctionDescriptor: FunctionDescriptor?
   get() = getEnclosingFunctionDescriptor(
     given<BindingContext>(),
-    this
+    this,
+    false
   )
 context(BindingContext) val KtExpression.referenceTargets: Collection<DeclarationDescriptor>
   get() = getReferenceTargets(

@@ -19,10 +19,12 @@ package io.github.kyay10.koncept.utils
 
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import kotlin.reflect.KProperty
 
+@OptIn(ExperimentalCompilerApi::class)
 open class OptionCommandLineProcessor(override val pluginId: String) : CommandLineProcessor {
   @PublishedApi
   internal val _pluginOptions: MutableCollection<TransformableCliOption<*>> = mutableListOf()

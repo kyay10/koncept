@@ -43,10 +43,10 @@ dependencies {
   testImplementation("org.junit.platform:junit-platform-launcher")
   testImplementation("org.junit.platform:junit-platform-runner")
   testImplementation("org.junit.platform:junit-platform-suite-api")
-  testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:${Dependencies.kotlinCompiler}")
+  //testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:${Dependencies.kotlinCompiler}")
   testImplementation("org.jetbrains.kotlin:kotlin-reflect:${Dependencies.kotlinCompiler}")
   testImplementation("org.jetbrains.kotlin:kotlin-compiler-internal-test-framework:${Dependencies.kotlinCompiler}")
-  testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.9")
+  //testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.9")
   testRuntimeOnly("org.jetbrains.kotlin:kotlin-test")
   testRuntimeOnly("org.jetbrains.kotlin:kotlin-script-runtime")
   testRuntimeOnly("org.jetbrains.kotlin:kotlin-annotations-jvm")
@@ -77,6 +77,11 @@ buildConfig {
   )
   buildConfigField(
     "String",
+    "NOTHING_FUN_FQNAME",
+    "\"$packageSanitized.nothing\""
+  )
+  buildConfigField(
+    "String",
     "KOTLIN_PLUGIN_ID",
     "\"${rootProject.extra["kotlin_plugin_id"].toString().replace("-", "")}\""
   )
@@ -89,7 +94,8 @@ buildConfig {
 tasks.withType<KotlinCompile> {
   incremental = false
   kotlinOptions.jvmTarget = "1.8"
-  kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+  kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+  kotlinOptions.freeCompilerArgs += "-opt-in=org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction"
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
 val generateTests by tasks.creating(JavaExec::class) {
@@ -103,11 +109,12 @@ val compileTestKotlin by tasks.getting {
 }
 kapt {
   generateStubs = false
-  this.includeCompileClasspath = true
 }
 java {
   withSourcesJar()
   withJavadocJar()
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
 }
 publishing {
   publications {

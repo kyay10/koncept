@@ -3,6 +3,7 @@ package io.github.kyay10.koncept
 import io.github.kyay10.koncept.utils.map
 import io.github.kyay10.koncept.utils.safeAs
 import io.github.kyay10.koncept.utils.withContexts
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.PrivateForInline
@@ -43,6 +44,7 @@ import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.types.TypeApproximatorConfiguration
+import org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 class KonceptExpressionResolutionExtension(
@@ -56,10 +58,11 @@ class KonceptExpressionResolutionExtension(
     val HAS_CONCEPT_ANNOTATION = annotated(CONCEPT_ANNOTATION_FQNAME)
   }
 
-  val conceptFunctions by lazy {
+  val conceptFunctionsLazy = lazy {
     session.predicateBasedProvider.getSymbolsByPredicate(HAS_CONCEPT_ANNOTATION)
       .filterIsInstance<FirNamedFunctionSymbol>()
   }
+  val conceptFunctions by conceptFunctionsLazy
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
     register(HAS_CONCEPT_ANNOTATION)
@@ -74,7 +77,8 @@ class KonceptExpressionResolutionExtension(
     }
     withContexts(resolveComponents) {
       val calleeReference = functionCall.calleeReference
-      if (calleeReference is FirErrorNamedReference) {
+      //TODO remove this
+      /*if (calleeReference is FirErrorNamedReference) {
         val missingContextReceivers = buildList {
           when (val diagnostic = calleeReference.diagnostic) {
             is ConeAmbiguityError, is ConeInapplicableCandidateError -> if (diagnostic is ConeDiagnosticWithCandidates) {
@@ -154,15 +158,17 @@ class KonceptExpressionResolutionExtension(
             })
           }
         }
-      }
+      }*/
       return emptyList()
     }
   }
 
+  @OptIn(UnsafeCastFunction::class)
   val regularResolveComponents: FirAbstractBodyResolveTransformer.BodyResolveTransformerComponents
     get() = transformerComponentsList.single {
       it is FirAbstractBodyResolveTransformer.BodyResolveTransformerComponents && it.transformer::class == FirBodyResolveTransformer::class
     }.cast()
+  @OptIn(UnsafeCastFunction::class)
   val implicitResolveComponents: FirAbstractBodyResolveTransformer.BodyResolveTransformerComponents
     get() = transformerComponentsList.single {
       it is FirAbstractBodyResolveTransformer.BodyResolveTransformerComponents && it.transformer::class == FirImplicitAwareBodyResolveTransformer::class

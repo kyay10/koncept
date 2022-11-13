@@ -35,6 +35,10 @@ context(Display<X, C1, C2, C3, C4, C5, C6, C7>, C1, C2, C3, C4, C5, C6, C7)
 fun <X, C1, C2, C3, C4, C5, C6, C7> X.display() =
   display(this)
 
+context(C1, C2, C3, C4, C5, C6, C7)
+fun <X, C1, C2, C3, C4, C5, C6, C7> X.displayWithParam(display: Display<X, C1, C2, C3, C4, C5, C6, C7>) =
+  display.display(this)
+
 @Concept
 fun intDisplay(): SingleDisplay<Int> = IntDisplay
 
@@ -58,6 +62,7 @@ sealed interface ListDisplay<T> : Display<List<T>, SingleDisplay<T>, Unit, Unit,
 fun <E> listDisplay() = ListDisplay as ListDisplay<E>
 
 fun box(): String {
+  listOf("hello", "world").displayWithParam(listDisplay())
   listOf("hello", "world").display()
   return "OK".display<String, _, _, _, _, _, _, _>().drop(15.display().drop(12).toInt())
 }
